@@ -114,18 +114,17 @@ class RauthResponse(Response):
 
         self._cached_content = None
 
-    @property
-    def content(self):
-        '''
-        The content associated with the response. The content is parsed into a
-        more useful format, if possible, using :func:`parse_response`.
-
-        The content is cached, so that :func:`parse_response` is only run once.
-        '''
-        if self._cached_content is None:
-            # the parsed content from the server
-            self._cached_content = parse_response(self.response)
-        return self._cached_content
+#    @property
+#    def content(self):
+#        '''
+#        The content associated with the response. The content is parsed into a
+#        more useful format, if possible, using :func:`parse_response`.
+#        The content is cached, so that :func:`parse_response` is only run once.
+#        '''
+#        if self._cached_content is None:
+#            # the parsed content from the server
+#            self._cached_content = parse_response(self.response)
+#        return self._cached_content
 
     @property
     def status(self):
