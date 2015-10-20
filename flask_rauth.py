@@ -224,7 +224,7 @@ class RauthOAuth2(OAuth2Service, RauthServiceMixin):
     '''
     def __init__(self, app=None, base_url=None, consumer_key=None, consumer_secret=None, **kwargs):
         RauthServiceMixin.__init__(self, app=app, base_url=base_url)
-        OAuth2Service.__init__(self, consumer_key=consumer_key, consumer_secret=consumer_secret, **kwargs)
+        OAuth2Service.__init__(self, consumer_key, consumer_secret, **kwargs)
 
     def authorize(self, callback, **authorize_params):
         '''
