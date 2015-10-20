@@ -14,7 +14,7 @@ from functools import wraps
 from urllib.parse import urljoin
 from flask import request, session, redirect, current_app
 from werkzeug import parse_options_header
-from rauth.service import OAuth2Service, OAuth1Service, OflyService, Response, parse_utf8_qsl
+from rauth.service import OAuth2Service, OAuth1Service, OflyService, parse_utf8_qsl
 
 # specified by the OAuth 2.0 spec
 # http://tools.ietf.org/html/draft-ietf-oauth-v2-31#section-4.1.4
@@ -100,45 +100,6 @@ class RauthException(RuntimeError):
 
     def __unicode__(self):
         return self.message
-
-class RauthResponse(Response):
-    '''
-    This class inherits :class:`rauth.service.Response`.
-
-    :param resp: A :class:`rauth.service.Response`, whose `response` attribute
-        will be re-wrapped, with better content parsing.
-    '''
-    def __init__(self, resp):
-        # the original response
-        self.response = resp.response
-
-        self._cached_content = None
-
-#    @property
-#    def content(self):
-#        '''
-#        The content associated with the response. The content is parsed into a
-#        more useful format, if possible, using :func:`parse_response`.
-#        The content is cached, so that :func:`parse_response` is only run once.
-#        '''
-#        if self._cached_content is None:
-#            # the parsed content from the server
-#            self._cached_content = parse_response(self.response)
-#        return self._cached_content
-
-    @property
-    def status(self):
-        '''
-        The status code of the response.
-        '''
-        return self.response.status_code
-
-    @property
-    def content_type(self):
-        '''
-        The Content-Type of the response.
-        '''
-        return self.response.headers.get('content-type')
 
 class RauthServiceMixin(object):
     '''
@@ -301,10 +262,10 @@ class RauthOAuth2(OAuth2Service, RauthServiceMixin):
                 if 'error' in request.args and request.args['error'] == ACCESS_DENIED:
                     resp = ACCESS_DENIED
                 elif 'code' in request.args:
-                    resp = RauthResponse(self.get_access_token(method=method, data={
+                    resp = self.get_access_token(method=method, data={
                         'code': request.args['code'],
                         'redirect_uri': session.pop(self._session_key('redirect_uri'), None)
-                    }))
+                    })
 
                     if resp.status != 200:
                         raise RauthException('An error occurred while getting the OAuth 2.0 access_token', resp)
@@ -347,7 +308,7 @@ class RauthOAuth2(OAuth2Service, RauthServiceMixin):
             kwargs['params']['access_token'] = access_token
 
         # call the parent implementation
-        return RauthResponse(OAuth2Service.request(self, method, url, **kwargs))
+        return OAuth2Service.request(self, method, url, **kwargs)
 
 class RauthOAuth1(OAuth1Service, RauthServiceMixin):
     '''
